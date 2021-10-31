@@ -2,10 +2,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, TemplateView, FormView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, TemplateView, FormView, UpdateView, DeleteView, CreateView
 from .forms import PostForm
 from .filters import PostFilter
-from .models import Post, Category, Subscriber, CategorySub
+from .models import Post, Category, Subscriber, CategorySub, Author
 from .secda import admail
 
 class IndexPage(TemplateView):
@@ -36,32 +36,20 @@ class PostDetail(DetailView):
     template_name = 'news/post.html'  # название шаблона будет post.html
     context_object_name = 'post'  # название объекта. в нём будет
 
-class AddPub(FormView): #(PermissionRequiredMixin,FormView):
-    model = Post
+class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
     template_name = 'news/add.html'
-    context_object_name = 'add'
     form_class = PostForm
     #permission_required = ('post.add_post',)
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)  # создаём новую форму, забиваем в неё данные из POST-запроса
-
-        if form.is_valid():  # если пользователь ввёл всё правильно и нигде не ошибся, то сохраняем новый пост
-            form.save()
-
-        return super().get(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name = 'author').exists()
+        context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         return context
 
 class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
-    model = Post  # модель всё та же, но мы хотим получать детали конкретно отдельного поста
     template_name = 'news/edit.html'  # название шаблона будет edit.html
-    #context_object_name = 'post'  # название объекта. в нём будет
     form_class = PostForm
-    permission_required = ('news.edit_post',)
+    #permission_required = ('news.edit_post',)
 
     def get_object(self, **kwargs):
         id = self.kwargs.get('pk')
@@ -69,18 +57,17 @@ class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name = 'author').exists()
+        context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         return context
 
 class PostDelete(LoginRequiredMixin, DeleteView):
-
     template_name = 'news/delete.html'  # название шаблона
     queryset = Post.objects.all()
     success_url = 'news/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['is_not_author'] = not self.request.user.groups.filter(name = 'author').exists()
+        context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         return context
 
 class CategoryList(ListView):
@@ -98,10 +85,12 @@ class CategoryView(ListView):
         context = super().get_context_data(**kwargs)
         id = self.kwargs.get('pk')
         context['categoryview'] = Post.objects.filter(category=id).order_by('-date')  # вписываем наш фильтр в контекст
-        print (self.request.user.id)
+        print (self.request)
         usr = self.request.user.id
         context['not_subscriber'] = not Subscriber.objects.filter(user_id = usr, category=id).exists()
+        context['category'] = Category.objects.get(id=id)
         return context
+
 
 class SubscribeCategory(TemplateView):
     template_name = 'news/subscribed.html'

@@ -9,7 +9,7 @@
 <!-- В контенте на странице мы выводим все публикации -->
 {% block content %}
 
-<h1>Список публикаций</h1>
+<h1>Список публикаций в категории "{{ category.name }}"</h1>
 <!--<button> <a class="btn btn-primary" href="/news/subscribe/"> Подписаться на спам </a> </button>-->
 <!--<a class="btn btn-primary" href="send_mail"> Стать подписчиком </a>-->
 {% if not_subscriber %}

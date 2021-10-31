@@ -45,7 +45,7 @@ class Category(models.Model):
     #subscribers = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Подписчик')
 
     def __str__(self):
-        return self.name
+        return f'{self.name}'
 
     class Meta:
         verbose_name = 'Категория'

@@ -10,12 +10,15 @@
 {% block content %}
 <!--не актуально после создания системы логина-->
 {% if is_not_author %}
-Для добавления публикаций Вам нужно быть автором.
+Для добавления публикаций Вам нужно быть автором. <br>
+<button> <a class="btn btn-primary" href="/news/becomeauthor/"> Стать автором </a> </button>
 {% endif %}
-{% if author %}
+{% if not is_not_author %}
+
 <form method="POST">
     {% csrf_token %}
-    {{ form }} <!-- Теперь нам нужна только готовая форма и кнопка -->
+    {{ form.as_p }} <!-- Теперь нам нужна только готовая форма и кнопка -->
+    <br>
     <input type="submit" value="Добавить публикацию">
 </form>
 {% endif %}

@@ -3,14 +3,14 @@
 {% block title %} Редактирование публикации {% endblock title %}
 
 {% block content %}
-{% if author %}
+{% if not is_not_author %}
 <form method="POST">
     {% csrf_token %}
-    {{ form }} <!-- Теперь нам нужна только готовая форма и кнопка -->
+    {{ form.as_p }} <!-- Теперь нам нужна только готовая форма и кнопка -->
     <input type="submit" value="Редактировать">
 </form>
 {% endif %}
 {% if is_not_author %}
-Для редактирования публикаций запишитесь в словоблуды.
+Для редактирования публикаций запишитесь в авторы.
 {% endif %}
 {% endblock content %}
