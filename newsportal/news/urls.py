@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import PostDetail, News, SearchNews, AddPub, PostEdit, PostDelete, \
-    CategoryList, CategoryView, SubscribeCategory, send_email, IndexPage  # импортируем наше представление
+    CategoryList, CategoryView, SubscribeCategory, send_email, IndexPage, \
+    add_me_to_authors  # импортируем наше представление
 
 urlpatterns = [
     # path — означает путь. В данном случае путь ко всем постам у нас останется пустым, позже станет ясно, почему
@@ -16,7 +17,7 @@ urlpatterns = [
     path('categories/', CategoryList.as_view()),
     path('category/<int:pk>', CategoryView.as_view(), name='category_list'),
     path('subscribe/', send_email),#, name = 'send_mail'),
-    #path('becomeauthor/'),
+    path('becomeauthor/', add_me_to_authors),
     path('subscribed/', SubscribeCategory.as_view()),
 
 ]

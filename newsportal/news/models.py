@@ -66,14 +66,14 @@ class Post(models.Model):
     # заголовок статьи/новости
     name = models.CharField(max_length=255, verbose_name='Название')
     # текст статьи/новости
-    body = models.TextField()
+    body = models.TextField(verbose_name='Tекст')
     # рейтинг статьи/новости
     rating = models.SmallIntegerField(default=0, verbose_name='Рейтинг')
 
     # связь «один ко многим» с моделью Author
-    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, verbose_name='Автор')
     # связь «многие ко многим» с моделью Category (с дополнительной моделью PostCategory)
-    category = models.ManyToManyField(Category, through='PostCategory')
+    category = models.ManyToManyField(Category, through='PostCategory', verbose_name='Категория')
 
     def preview(self):
         preview = self.body[0:123]

@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import redirect
-from django.views.generic import ListView, DetailView, TemplateView, FormView, UpdateView, DeleteView, CreateView
+from django.views.generic import ListView, DetailView, TemplateView, UpdateView, DeleteView, CreateView
 from .forms import PostForm
 from .filters import PostFilter
 from .models import Post, Category, Subscriber, CategorySub, Author
@@ -44,7 +44,9 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
+        context['author'] = Author.objects.filter(user_id=self.request.user.id)
         return context
+
 
 class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
     template_name = 'news/edit.html'  # название шаблона будет edit.html
@@ -92,8 +94,15 @@ class CategoryView(ListView):
         return context
 
 
+
 class SubscribeCategory(TemplateView):
     template_name = 'news/subscribed.html'
+
+def add_me_to_authors(request):
+    user = request.user.id
+    if not Author.objects.filter(user_id=user).exists():
+        Author.objects.create(user_id=user)
+    return redirect('/')
 
 @login_required
 def send_email(request):
