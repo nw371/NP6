@@ -1,0 +1,22 @@
+<!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
+{% extends 'default.html' %}
+{% load my_filters %}
+<!-- Название у нас будет Новости -->
+{% block title %}
+Категории
+{% endblock title %}
+
+<!-- В контенте на странице мы выводим все публикации -->
+{% block content %}
+
+
+{% for category in categories %}
+
+<a href="/news/category/{{category.id}}">{{ category.name }} </a>
+<br>
+{% endfor %}
+
+
+
+{% endblock content %}
+
