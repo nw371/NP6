@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView, DeleteView, CreateView
@@ -45,8 +46,17 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         context['author'] = Author.objects.filter(user_id=self.request.user.id)
+        #context['request'] = self.request
         return context
 
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        print("View: ",kwargs)
+        return kwargs
 
 class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
     template_name = 'news/edit.html'  # название шаблона будет edit.html
@@ -61,6 +71,15 @@ class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         return context
+
+    def get_form_kwargs(self):
+        """ Passes the request object to the form class.
+         This is necessary to only display members that belong to a given user"""
+
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        print("View: ",kwargs)
+        return kwargs
 
 class PostDelete(LoginRequiredMixin, DeleteView):
     template_name = 'news/delete.html'  # название шаблона
@@ -108,21 +127,24 @@ def add_me_to_authors(request):
 def send_email(request):
     cat = request.META.get('HTTP_REFERER')[-1] #получаем id категории из request
     user = request.user.id #получаем id залогиненого юзера
-    sbs = list(Subscriber.objects.all().values("user_id")) #вытаскиваем всех подписчиков из базы
-    if user not in [d['user_id'] for d in sbs]: #проверяем есть-ли текущий юзер среди подписчиков
-        Subscriber.objects.create(user_id=user) #если нет - добавляем
-    casbs = list(CategorySub.objects.all().values("subscriber_id"))
-    sbid = Subscriber.objects.get(user_id = user).id
-    if sbid not in [d['subscriber_id'] for d in casbs]:
-        Subscriber.objects.get(user_id = user).category.add(Category.objects.get(id=cat)) #подписываем юзера на текущую категорию
-    #
+
     # отправляем письмо
     msg = EmailMultiAlternatives(
         subject=f'Вы подписались на категроию {Category.objects.get(id=cat)}',
-        body='Спасибо за подписку на нашем сайте',  # сообщение с кратким описанием проблемы
+        body=f'Уважаемый {User.objects.get(id=user)}, Спасибо за подписку на нашем сайте',  # сообщение с кратким описанием проблемы
         from_email=admail,  # здесь указываете почту, с которой будете отправлять (об этом попозже)
         to=[admail], # здесь список получателей. Например, секретарь, сам врач и т. д.
     )
     msg.send()
     return redirect("/news/subscribed/")
     #return HttpResponseRedirect("/news/subsribed")
+
+def add_to_subscribers(request):
+    user = request.user.id
+    cat = request.META.get('HTTP_REFERER')[-1]
+    if not Subscriber.objects.filter(user_id = user).exists():
+        Subscriber.objects.create(user_id=user)
+    if not Subscriber.objects.filter(user_id = user, category=cat).exists():
+        Subscriber.objects.get(user_id=user).category.add(Category.objects.get(id=cat))
+        send_email(request)
+    return redirect('/news/subscribed/')
