@@ -14,11 +14,13 @@ def notify_subscribers_publication(sender, instance, created, **kwargs):
 
     list_of_dictcs= list(Subscriber.objects.filter(category=1).values('user__email'))
     list_of_subscribers = [d['user__email'] for d in list_of_dictcs if 'user__email' in d]
+    print(list_of_subscribers)
 
     # отправляем письмо
-    EmailMultiAlternatives(
+    msg = EmailMultiAlternatives(
         subject=subject,
         body=f'Уважаемый подписчик, в интересующих Вас категориях произошли изменения',  # сообщение с кратким описанием
         from_email=admail,  # здесь указываете почту, с которой будете отправлять
-        to=[list_of_subscribers], # здесь список получателей. Например, секретарь, сам врач и т. д.
+        to=list_of_subscribers, # здесь список получателей. Например, секретарь, сам врач и т. д.
     )
+    msg.send()
