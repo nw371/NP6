@@ -5,8 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-<a href="/news/{{post.id}}">{{ post.name }} </a>
+<a href="http://127.0.0.1:8000/news/{{post.id}}">{{ post.name }} </a>
+<br>
 {{post.body|truncatewords:20}}
+<br>
+{{instance}}
 </body>
 </html>
 

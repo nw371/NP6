@@ -16,9 +16,10 @@ def notify_subscribers_publication(sender, instance, created, **kwargs):
 
     list_of_dictcs= list(Subscriber.objects.filter(category=1).values('user__email'))
     list_of_subscribers = [d['user__email'] for d in list_of_dictcs if 'user__email' in d]
-    print(instance.id)
+    print("THIS IS INSTANCE: ",instance)
 
-    pub_updates = render_to_string('email/pub_updates.html', {'context': 'values'})
+    pub_updates = render_to_string('email/pub_updates.html', {'post': instance, 'instance': instance.id})
+    print("STRING_THE: ",pub_updates)
     # отправляем письмо
     msg = EmailMultiAlternatives(
         subject=subject,

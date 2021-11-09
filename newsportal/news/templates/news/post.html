@@ -1,7 +1,7 @@
 <!--  наследуемся от шаблона default.html, который мы создавали ещё во времена flatpages -->
 {% extends 'default.html' %}
 {% load my_filters %}
-<!-- Название у нас будет proudcts -->
+<!-- Название-->
 {% block title %}
 {{ post.name|censor }}
 <br>
