@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from django.conf import settings
@@ -5,16 +6,28 @@ from django.conf import settings
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
 from django.core.management.base import BaseCommand
+
 from django_apscheduler.jobstores import DjangoJobStore
 from django_apscheduler.models import DjangoJobExecution
 
+from news.models import Category, Post #pycharm хреново работает с путями в django поектах. этот импорт, хоть и подчёркнут. но работает
+
 logger = logging.getLogger(__name__)
 
+def collect_weekly_articles():
+    date_to_filter = datetime.date.today()-datetime.timedelta(days=7)
+    print(date_to_filter)
+
+    arts = Post.objects.filter(date__lte = date_to_filter).values("name")
+    # Subscriber.objects.filter(category=1).values('user__email')
+    arts = Category.objects.filter(id=1, post__date__lte = date_to_filter).values("post__name") #выдираем названия статей категории 1 созданных/изменённых за последнюю неделю
+    print(arts)
 
 # наша задача по выводу текста на экран
 def my_job():
     #  Your job processing logic here...
     print('hello from job')
+    collect_weekly_articles()
 
 
 # функция, которая будет удалять неактуальные задачи
@@ -33,7 +46,7 @@ class Command(BaseCommand):
         # добавляем работу нашему задачнику
         scheduler.add_job(
             my_job,
-            trigger=CronTrigger(second="*/10"),
+            trigger=CronTrigger(second="*/3"),
             # То же, что и интервал, но задача тригера таким образом более понятна django
             id="my_job",  # уникальный айди
             max_instances=1,
