@@ -5,6 +5,53 @@
     <title>Title</title>
 </head>
 <body>
+<!-- В контенте на странице мы выводим все публикации -->
+{% block content %}
 
+<h1>Список публикаций</h1>
+<h1>Показано {{news|length}} публикаций.</h1>
+    <table>
+            <tr>
+                <td>
+                    <b>Заголовок</b>
+                </td>
+                <td>
+                     <b><pre> | </pre></b>
+                </td>
+                <td>
+                    <b>Дата</b>
+                </td>
+                <td>
+                     <b><pre> | </pre></b>
+                </td>
+                <td>
+                    <b>Предпросмотр</b>
+                </td>
+            </tr>
+        {% for post in news %}
+            <tr>
+                <td>
+                   <a href="/news/{{post.id}}">{{ post.name }} </a>
+                    <br>
+                    ------------------------------------------------
+                </td>
+                <td>
+                     <b><pre> | </pre></b>
+                </td>
+                <td>
+                    {{post.date|date:'d m Y'}}
+                </td>
+                <td>
+                    <b><pre> | </pre></b>
+                </td>
+                <td>
+                    {{post.body|truncatewords:20|censor}}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+<!-- Проверяем что поддерживается постраничный вывод -->
+
+{% endblock content %}
 </body>
 </html>

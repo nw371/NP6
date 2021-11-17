@@ -159,7 +159,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ACCOUNT_USERNAME_REQUIRED = False
 # ACCOUNT_AUTHENTICATION_METHOD = 'email'
 # ACCOUNT_EMAIL_VERIFICATION = 'none'
-# ACCOUNT_FORMS = {'signup': 'sign.forms.BasicSignupForm'}
+# # ACCOUNT_FORMS = {'signup': 'sign.forms.BasicSignupForm'}
 #
 # EMAIL_HOST = smtpserv  # адрес сервера Яндекс-почты для всех один и тот же
 # EMAIL_PORT = smtport  # порт smtp сервера тоже одинаковый

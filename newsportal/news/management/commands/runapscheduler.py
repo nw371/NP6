@@ -20,7 +20,7 @@ def collect_weekly_articles():
 
     arts = Post.objects.filter(date__lte = date_to_filter).values("name")
     # Subscriber.objects.filter(category=1).values('user__email')
-    arts = Category.objects.filter(id=1, post__date__lte = date_to_filter).values("post__name") #выдираем названия статей категории 1 созданных/изменённых за последнюю неделю
+    arts = Category.objects.filter(id=1, post__date__gte = date_to_filter).values("post__name", "post__id") #выдираем названия статей категории 1 созданных/изменённых за последнюю неделю
     print(arts)
 
 # наша задача по выводу текста на экран

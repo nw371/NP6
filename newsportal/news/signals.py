@@ -32,3 +32,4 @@ def notify_subscribers_publication(sender, instance, created, **kwargs):
     print("BODY: ", msg.body)
     print("MESSAGE : ", msg.message())
     msg.send()
+    #LoTp78rN6zVwptLy
