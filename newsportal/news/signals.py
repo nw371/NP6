@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-from .models import Post, Subscriber
+from .models import Post, Subscriber, Category, PostCategory, CategorySub
 from .secda import admail
 
 
@@ -14,8 +14,15 @@ def notify_subscribers_publication(sender, instance, created, **kwargs):
     else:
         subject = f'Изменена публикация: {instance.name} {instance.date.strftime("%d %m %Y")}'
 
-    list_of_dictcs= list(Subscriber.objects.filter(category=1).values('user__email'))
-    list_of_subscribers = [d['user__email'] for d in list_of_dictcs if 'user__email' in d]
+    # print("INSTANCE CATEGROY",PostCategory.objects.filter(post_id=instance.id).values('category_id'))
+
+    cat_id = list(PostCategory.objects.filter(post_id=instance.id).values('category_id'))[0].get('category_id')
+    # print('EXTRACTED', cat_id)
+    # print("SUBS LIST", Subscriber.objects.filter())
+    filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=cat_id).values('subscriber_id__user__email'))
+    # print('FILTERED SUBSCRIBERS', filtered_susbscrbrs)
+    # list_of_dictcs= list(Subscriber.objects.filter(category=1).values('user__email'))
+    list_of_subscribers = [d['user__email'] for d in filtered_susbscrbrs if 'user__email' in d]
     print("THIS IS INSTANCE: ",instance)
 
     pub_updates = render_to_string('email/pub_updates.html', {'post': instance, 'instance': instance.id})
