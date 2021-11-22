@@ -8,7 +8,15 @@ from django.template.loader import render_to_string
 from .models import Post, Subscriber, Category, PostCategory, CategorySub, Author
 from .secda import admail
 from .views import AddPub, my_post_signal
-
+@receiver(post_save, sender=Post)
+def notify_subscribers_publication(sender, instance, created, **kwargs):
+    if not created:
+        subject = f'Изменена публикация: {instance.name} {instance.date.strftime("%d %m %Y")}'
+        cat_id = list(PostCategory.objects.filter(post_id=instance.id).values('category_id'))[0].get('category_id')
+        filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=cat_id).values('subscriber_id__user__email'))
+        list_of_subscribers = [d['user__email'] for d in filtered_susbscrbrs if 'user__email' in d]
+        pub_updates = render_to_string('email/pub_updates.html', {'post': instance, 'instance': instance.id})
+        send_updates(subject, pub_updates, list_of_subscribers)
 
 @receiver(m2m_changed, sender=Post.category.through)
 def notify_subscribers_publication(sender, instance, **kwargs):
@@ -17,7 +25,10 @@ def notify_subscribers_publication(sender, instance, **kwargs):
     filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=cat_id).values('subscriber_id__user__email'))
     list_of_subscribers = [d['user__email'] for d in filtered_susbscrbrs if 'user__email' in d]
     pub_updates = render_to_string('email/pub_updates.html', {'post': instance, 'instance': instance.id})
-    # отправляем письмо
+    send_updates(subject, pub_updates, list_of_subscribers)
+
+
+def send_updates(subject, pub_updates, list_of_subscribers):
     msg = EmailMultiAlternatives(
         subject=subject,
         # body=f'Уважаемый подписчик, в интересующих Вас категориях произошли изменения. Можете перейти по ссылке http://127.0.0.1:8000/news/{instance.id}',  # сообщение с кратким описанием
@@ -29,31 +40,6 @@ def notify_subscribers_publication(sender, instance, **kwargs):
     print("BODY: ", msg.body)
     print("MESSAGE : ", msg.message())
     msg.send()
-
-
-@receiver(post_save, sender=Post)
-def notify_subscribers_publication(sender, instance, created, **kwargs):
-    if not created:
-        subject = f'Изменена публикация: {instance.name} {instance.date.strftime("%d %m %Y")}'
-        cat_id = list(PostCategory.objects.filter(post_id=instance.id).values('category_id'))[0].get('category_id')
-        filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=cat_id).values('subscriber_id__user__email'))
-        list_of_subscribers = [d['user__email'] for d in filtered_susbscrbrs if 'user__email' in d]
-        pub_updates = render_to_string('email/pub_updates.html', {'post': instance, 'instance': instance.id})
-
-        # отправляем письмо
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            # body=f'Уважаемый подписчик, в интересующих Вас категориях произошли изменения. Можете перейти по ссылке http://127.0.0.1:8000/news/{instance.id}',  # сообщение с кратким описанием
-            from_email=admail,  # здесь указываете почту, с которой будете отправлять
-            to=list_of_subscribers, # здесь список получателей. Например, секретарь, сам врач и т. д.
-        )
-        msg.attach_alternative(pub_updates, "text/html")
-        msg.content_subtype = "html"
-        print("BODY: ", msg.body)
-        print("MESSAGE : ", msg.message())
-        msg.send()
-
-
 
     #LoTp78rN6zVwptLy
 
