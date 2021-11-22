@@ -1,15 +1,14 @@
-from django.contrib.auth.models import User
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.core.mail import EmailMultiAlternatives
 
 from django.template.loader import render_to_string
 
-from .models import Post, Subscriber, Category, PostCategory, CategorySub, Author
+from .models import Post, PostCategory, CategorySub
 from .secda import admail
-from .views import AddPub, my_post_signal
+
 @receiver(post_save, sender=Post)
-def notify_subscribers_publication(sender, instance, created, **kwargs):
+def notify_subscribers_publication(instance, created, **kwargs):
     if not created:
         subject = f'Изменена публикация: {instance.name} {instance.date.strftime("%d %m %Y")}'
         cat_id = list(PostCategory.objects.filter(post_id=instance.id).values('category_id'))[0].get('category_id')
@@ -19,7 +18,7 @@ def notify_subscribers_publication(sender, instance, created, **kwargs):
         send_updates(subject, pub_updates, list_of_subscribers)
 
 @receiver(m2m_changed, sender=Post.category.through)
-def notify_subscribers_publication(sender, instance, **kwargs):
+def notify_subscribers_publication(instance, **kwargs):
     subject = f'Добавлена публикация: {instance.name} {instance.date.strftime("%d %m %Y")}'
     cat_id = list(kwargs.get('pk_set'))[0]
     filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=cat_id).values('subscriber_id__user__email'))
