@@ -8,7 +8,9 @@ from .forms import PostForm
 from .filters import PostFilter
 from .models import Post, Category, Subscriber, CategorySub, Author
 from .secda import admail
+import django.dispatch
 
+my_post_signal = django.dispatch.Signal()
 class IndexPage(TemplateView):
     template_name = 'default.html'
 
@@ -42,11 +44,13 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
     form_class = PostForm
     #permission_required = ('post.add_post',)
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         context['author'] = Author.objects.filter(user_id=self.request.user.id)
         #context['request'] = self.request
+        print("ADD PUB View CONTEXT: ", kwargs)
         return context
 
     def get_form_kwargs(self):
@@ -55,7 +59,8 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
 
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        print("View: ",kwargs)
+        print("ADD PUB View kwargs: ",kwargs)
+        #my_post_signal.send(sender=Post, instance=kwargs)
         return kwargs
 
 class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
@@ -78,13 +83,13 @@ class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
 
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        print("View: ",kwargs)
+        print("POST EDIT View kwargs: ",kwargs)
         return kwargs
 
 class PostDelete(LoginRequiredMixin, DeleteView):
-    template_name = 'news/delete.html'  # название шаблона
+    template_name = 'news/delete.html'  # название шаблона    template_name = 'news/delete.html'  # название шаблона
     queryset = Post.objects.all()
-    success_url = 'news/'
+    success_url = '/news/'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

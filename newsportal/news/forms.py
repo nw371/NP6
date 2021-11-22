@@ -10,6 +10,7 @@ class PostForm(ModelForm):
     def __init__(self, *args, **kwargs):
         """ Grants access to the request object so that only members of the current user
         are given as options"""
+
         self.request = kwargs.pop('request')
         super().__init__(*args, **kwargs)
         self.fields['author'].queryset = Author.objects.filter(
@@ -17,7 +18,6 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
         fields = ['name', 'body', 'category', 'author']
-
 
 # class PostEdit(ModelForm):
 #     class Meta:

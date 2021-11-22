@@ -11,9 +11,9 @@ urlpatterns = [
     path('<int:pk>', PostDetail.as_view()),
     # pk — это первичный ключ товара, который будет выводиться у нас в шаблон
     path('search/', SearchNews.as_view()),
-    path('add/', AddPub.as_view(),name='pub_create'),
-    path('<int:pk>/edit/',PostEdit.as_view(), name='post_edit'),
-    path('<int:pk>/delete/',PostDelete.as_view(),name='post_delete'),
+    path('add/', AddPub.as_view(), name='pub_create'),
+    path('<int:pk>/edit/', PostEdit.as_view(), name='post_edit'),
+    path('<int:pk>/delete/', PostDelete.as_view(),name='post_delete'),
     path('categories/', CategoryList.as_view()),
     path('category/<int:pk>', CategoryView.as_view(), name='category_list'),
     path('subscribe/', add_to_subscribers),#, name = 'send_mail'),

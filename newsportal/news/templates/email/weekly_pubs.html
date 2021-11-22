@@ -9,49 +9,23 @@
 {% block content %}
 
 <h1>Список публикаций</h1>
-<h1>Показано {{news|length}} публикаций.</h1>
+<h1>За прощедшую неделю было добавлено {{posts|length}} публикаций.</h1>
     <table>
             <tr>
                 <td>
-                    <b>Заголовок</b>
-                </td>
-                <td>
-                     <b><pre> | </pre></b>
-                </td>
-                <td>
-                    <b>Дата</b>
-                </td>
-                <td>
-                     <b><pre> | </pre></b>
-                </td>
-                <td>
-                    <b>Предпросмотр</b>
+                    <b>Заголовок публикации</b>
                 </td>
             </tr>
-        {% for post in news %}
+        {% for post in posts %}
             <tr>
                 <td>
-                   <a href="http://127.0.0.1:8000/news/{{post.id}}">{{ post.name }} </a>
+                   <a href="http://127.0.0.1:8000/news/{{post.post__id}}">{{ post.post__name }} </a>
                     <br>
                     ------------------------------------------------
-                </td>
-                <td>
-                     <b><pre> | </pre></b>
-                </td>
-                <td>
-                    {{post.date|date:'d m Y'}}
-                </td>
-                <td>
-                    <b><pre> | </pre></b>
-                </td>
-                <td>
-                    {{post.body|truncatewords:20}}
                 </td>
             </tr>
         {% endfor %}
         </table>
-<!-- Проверяем что поддерживается постраничный вывод -->
-
 {% endblock content %}
 </body>
 </html>
