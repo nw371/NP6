@@ -35,7 +35,7 @@ def collect_weekly_articles():
         print(wkly_updates)
         filtered_susbscrbrs = list(CategorySub.objects.filter(category_id=i).values('subscriber_id__user__email'))
         print(f"FILTERED SUBS IN:  {i} CATEGORY: {filtered_susbscrbrs}")
-        list_of_subscribers = [d['user__email'] for d in filtered_susbscrbrs if 'user__email' in d]
+        list_of_subscribers = [d['subscriber_id__user__email'] for d in filtered_susbscrbrs if 'subscriber_id__user__email' in d]
         print(f'THIS IS LIST OF EMAILS EMAIL SUPPOUSED TO BE SENT: {list_of_subscribers}')
         # отправляем письмо
         msg = EmailMultiAlternatives(
