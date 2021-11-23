@@ -41,6 +41,5 @@ def send_updates(subject, pub_updates, list_of_subscribers):
     print("MESSAGE : ", msg.message())
     msg.send()
 
-    #LoTp78rN6zVwptLy
 
 

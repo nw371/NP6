@@ -18,8 +18,3 @@ class PostForm(ModelForm):
     class Meta:
         model = Post
         fields = ['name', 'body', 'category', 'author']
-
-# class PostEdit(ModelForm):
-#     class Meta:
-#         model = Post
-#         fields = ['name', 'body', 'category', 'author__user__name'']

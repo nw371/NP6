@@ -49,8 +49,6 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
         context = super().get_context_data(**kwargs)
         context['is_not_author'] = not Author.objects.filter(user_id=self.request.user.id).exists()
         context['author'] = Author.objects.filter(user_id=self.request.user.id)
-        #context['request'] = self.request
-        print("ADD PUB View CONTEXT: ", kwargs)
         return context
 
     def get_form_kwargs(self):
@@ -59,8 +57,6 @@ class AddPub(CreateView): #(PermissionRequiredMixin,CreateView):
 
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        print("ADD PUB View kwargs: ",kwargs)
-        #my_post_signal.send(sender=Post, instance=kwargs)
         return kwargs
 
 class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
@@ -83,7 +79,6 @@ class PostEdit(UpdateView): #(PermissionRequiredMixin, UpdateView):
 
         kwargs = super().get_form_kwargs()
         kwargs['request'] = self.request
-        print("POST EDIT View kwargs: ",kwargs)
         return kwargs
 
 class PostDelete(LoginRequiredMixin, DeleteView):
@@ -111,13 +106,10 @@ class CategoryView(ListView):
         context = super().get_context_data(**kwargs)
         id = self.kwargs.get('pk')
         context['categoryview'] = Post.objects.filter(category=id).order_by('-date')  # вписываем наш фильтр в контекст
-        print (self.request)
         usr = self.request.user.id
         context['not_subscriber'] = not Subscriber.objects.filter(user_id = usr, category=id).exists()
         context['category'] = Category.objects.get(id=id)
         return context
-
-
 
 class SubscribeCategory(TemplateView):
     template_name = 'news/subscribed.html'
@@ -142,7 +134,6 @@ def send_email(request):
     )
     msg.send()
     return redirect("/news/subscribed/")
-    #return HttpResponseRedirect("/news/subsribed")
 
 def add_to_subscribers(request):
     user = request.user.id

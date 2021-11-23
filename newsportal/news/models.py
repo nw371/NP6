@@ -42,7 +42,6 @@ class Author(models.Model):
 class Category(models.Model):
     # единственное поле: название категории. Поле должно быть уникальным
     name = models.CharField(max_length=128, unique=True, verbose_name='Название')
-    #subscribers = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Подписчик')
 
     def __str__(self):
         return f'{self.name}'
